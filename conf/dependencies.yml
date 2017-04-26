@@ -1,0 +1,6 @@
+# Application dependencies
+
+require:
+    - play 1.4.4
+    - org.glassfish.jersey.core -> jersey-client 2.25.1
+    - org.simpleframework -> simple-xml 2.7.1

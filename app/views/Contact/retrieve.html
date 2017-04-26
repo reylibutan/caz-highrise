@@ -1,0 +1,8 @@
+#{extends 'main.html' /}
+#{set title:'Contacts - Retrieve' /}
+
+<form action="@{Contact.doRetrieve()}" method="GET">
+    <input type="text" name="tag" /> 
+    <span class="error">#{error 'tag' /}</span>
+    <input type="submit" value="Retrieve contacts" />
+</form> 
