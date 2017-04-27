@@ -1,2 +1,2 @@
 # caz-highrise
-Play 1.4.4 with Highrise API
+Play 1.4.x with Highrise API
