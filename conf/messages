@@ -1,8 +1,12 @@
-# You can specialize this file for each language.
-# For example, for French create a messages.fr file
-#
-validation.required = %s is required
-validation.does_not_exist = %s does not exist
-
 # Fields
 tag = Tag
+
+# validation (field-related)
+validation.required = %s is required
+
+# error messages (logic-related)
+error.general = Unexpected error encountered
+error.does_not_exist = %s does not exist
+
+# success messages
+success.contact_retrieval = Successfully retrieved the following contacts tagged with "%s"

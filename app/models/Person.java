@@ -1,7 +1,9 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -9,7 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import dto.PersonDto;
+import dto.TagDto;
 import play.db.jpa.GenericModel;
 
 @Entity
@@ -33,8 +39,21 @@ public class Person extends GenericModel  {
 
 	@ManyToMany
 	@JoinTable(name = "person_tag")
+	@NotFound(action = NotFoundAction.IGNORE)
 	public Set<Tag> tags = new HashSet<>();
 
+	public static List<Person> findByTagId(Long tagId) {
+		List<Person> personList = new ArrayList<>();
+
+		personList = Person.find(
+		    "select p from Person p " +
+		    "join p.tags t " +
+		    "where t.id = ?", tagId
+		).fetch();
+
+		return personList;
+	}
+	
 	/*
 	 * instructions said to not use any 3rd party libs, so I'm doing this manually
 	 * without the instruction, I could have used an object mapping lib like mapstruct
@@ -55,6 +74,14 @@ public class Person extends GenericModel  {
 		person.companyName = dto.getCompanyName();
 		person.linkedinUrl = dto.getLinkedinUrl();
 		person.avatarUrl = dto.getAvatarUrl();
+
+		Set<Tag> tags = new HashSet<>(); 
+		List<TagDto> tagDtos = dto.getTagList().getTags();
+		for (TagDto tDto : tagDtos) {
+			Tag tag = Tag.convert(tDto);
+			tags.add(tag);
+		}
+		person.tags = tags;
 
 		return person;
 	}

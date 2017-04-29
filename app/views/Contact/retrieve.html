@@ -1,8 +1,45 @@
 #{extends 'main.html' /}
-#{set title:'Contacts - Retrieve' /}
+#{set title:'Contacts | Retrieve' /}
+#{set 'moreScripts'}
+	#{script 'contact.js' /}
+#{/set}
 
-<form action="@{Contact.doRetrieve()}" method="GET">
-    <input type="text" name="tag" /> 
-    <span class="error">#{error 'tag' /}</span>
-    <input type="submit" value="Retrieve contacts" />
-</form> 
+<div class="tag-form">
+	<div class="inner">
+
+		<a href="@{Contact.list()}" target="_parent">
+			<button id="goToListBtn" class="btn btn-primary btn-sm tag-nav-btn">Contact List</button>
+		</a>
+
+		<form action="@{Contact.doRetrieve()}" method="GET" class="form-inline" role="form">
+			<div class="form-group tagField">
+				<input id="tag" type="text" name="tag" class="tag-field form-control" placeholder="Enter tag" value="${flash.tag}">
+			</div>
+			<button type="submit" class="btn btn-outlined btn-primary">Get Contacts</button>
+		</form>
+
+		#{ifErrors}
+			<div class="alert alert-danger fade in">
+				#{errors}
+			       ${error} <br/>
+			   #{/errors}
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">ₓ</button>
+			</div>
+		#{/ifErrors}
+
+		#{if successMsg}
+			<div class="alert alert-success fade in">
+				${successMsg}
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">ₓ</button>
+			</div>
+		#{/if}
+
+		#{if retrievedPersonNames}
+			<ul class="list-group person-list">
+				#{list retrievedPersonNames, as : 'personName'}
+					<li class="list-group-item">${personName}</li>
+				#{/list}
+			</ul>
+		#{/if}
+	</div>
+</div>

@@ -1,0 +1,104 @@
+.btn,
+input.form-control {
+	font-size: 13px !important;
+}
+
+.alert {
+	position: relative;
+	font-size: 13px;
+	padding: 15px 25px;
+	border-radius: 10px;
+}
+
+.alert button.close {
+	position: absolute;
+	right: 15px;
+	top: 5px;
+	font-size: 20px;
+}
+
+.tag-form {
+	width: 100%;
+	position: absolute;
+	top: 100px;
+	height: 280px;
+}
+
+.tag-form .inner {
+	max-width: 640px;
+	padding: 20px;
+	margin: auto;
+}
+
+.tag-form .form-group {
+	width: 65%;
+} 
+
+.tag-field.form-control {
+	width: 100%;
+}
+
+.field-error-msg {
+	position: absolute;
+	margin-top: 5px;
+	margin-left: 17px;
+	font-size: 13px;
+	color: #D24D57
+}
+
+.person-list {
+	font-size: 13px;
+}
+
+.person-list li {
+	padding: 15px 20px;
+}
+
+.tag-nav-btn {
+	margin-bottom: 15px;
+}
+
+.tag-form form {
+	margin-bottom: 15px;
+}
+
+.tag-form.list .inner {
+	max-width: 1000px;
+}
+
+.person-list-container {
+	/* max-height: 700px;
+	overflow: auto; */
+}
+
+.person-list,
+.person-list th {
+	text-align: left !important;
+}
+
+.person-list th {
+	padding: 15px 12px !important;
+	vertical-align: middle !important;
+}
+
+.person-list td {
+	color: #909090;
+	padding: 10px 12px !important;
+	vertical-align: middle !important;
+}
+
+.person-list .avatar-col {
+	width: 150px;
+	padding: 5px;
+}
+
+.person-list .avatar-col img {
+	margin: auto;
+	height: 25px;
+	width: 25px;
+}
+
+.empty-list-col {
+	color: #BBBBBB;
+	text-align: center;
+}

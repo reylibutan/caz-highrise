@@ -14,24 +14,14 @@ import dto.PersonListDto;
 import dto.TagDto;
 import dto.TagListDto;
 import models.Person;
+import models.Tag;
+import play.Logger;
 import play.db.jpa.NoTransaction;
+import play.i18n.Messages;
 import play.mvc.Controller;
 import utils.AppConstants;
 import utils.HighRiseClient;
 
-/*
- * ============================================================================
- * TODO
- * 		> Shouldn't I name controllers as FooController?
- * 		> Shouldn't I separate controllers base on functionality, treating them as resources? ex. CompanyController, PersonController vs. ApplicationController
- * 		> If I use XController naming, how to customize view folders so that I should not be required to name them as "views/ApplicationController" and just "views/Application"
- * 
- * 
- * 		1. Do security (login2 using username password / account URL)
- * 		2. Make Filter for setting request media type (XML)
- * 		3. Make a static method in HighRiseClient -> HighRiseClient.invoke(URL, params) returns String
- * ============================================================================
- */
 public class Contact extends Controller {
 
 	@NoTransaction
@@ -45,15 +35,13 @@ public class Contact extends Controller {
 	}
 
 	public static void doRetrieve(String tag) {
+		validation.clear();
 		validation.required(tag);
 
 		if (!validation.hasErrors()) {
 			Long tagId = getTagId(tag);
 			if (tagId == null) {
-				// ================================================================
-				// TODO - how to get this from messages?
-				// ================================================================
-				validation.addError(AppConstants.FIELD_TAG, AppConstants.VALIDATION_DOES_NOT_EXIST, AppConstants.FIELD_TAG);
+				validation.addError(AppConstants.FIELD_TAG, AppConstants.ERROR_MSG_DOES_NOT_EXIST, AppConstants.FIELD_TAG);
 			} else {
 				// retrieve all contacts using tag ID
 				Response resp = null;
@@ -62,26 +50,34 @@ public class Contact extends Controller {
 				PersonListDto personList = null;
 				Serializer serializer = HighRiseClient.getSerializer();
 
+				List<String> retrievedPersonNames = new ArrayList<>();
+
 				try {
 					resp = peopleTarget.request(MediaType.APPLICATION_XML_TYPE).get();
 					String peopleResponse = resp.readEntity(String.class);
-
 					personList = serializer.read(PersonListDto.class, peopleResponse);
-
-					for(PersonDto personDto : personList.getPersons()) {
+					for (PersonDto personDto : personList.getPersons()) {
 						Person person = Person.convert(personDto);
+
+						for (Tag tagModel : person.tags) {
+							tagModel.merge();
+						}
+
 						person = person.merge();
 						person.save();
+
+						retrievedPersonNames.add(((person.firstName == null ? "" : person.firstName) + " " + (person.lastName == null ? "" : person.lastName)).trim());
 					}
 
-					System.out.println(Person.count());
+					renderArgs.put(AppConstants.PARAM_SUCCESS_MSG, Messages.get(AppConstants.SUCCESS_CONTACT_RETRIEVAL, tag));
+					renderArgs.put(AppConstants.PARAM_RETRIEVED_PERSON_NAMES, retrievedPersonNames);
 				} catch (Exception e) {
-					// ===================================================================
-					// TODO - do logging
-					// ===================================================================
-					e.printStackTrace();
+					validation.addError(null, AppConstants.ERROR_MSG_GENERAL);
+					Logger.error(e, Messages.get(AppConstants.ERROR_MSG_GENERAL));
 				} finally {
-					resp.close();
+					if (resp != null) {
+						resp.close();
+					}
 				}
 			}
 		}
@@ -89,12 +85,32 @@ public class Contact extends Controller {
 		if (validation.hasErrors()) {
 			params.flash();
 			validation.keep();
-			retrieve();
-
-			// ===================================================================
-			// TODO - retain "tag" value so textbox is still populated after error
-			// ===================================================================
 		}
+
+		// retrieve();
+		render("@retrieve");
+	}
+
+	// ========================================================================
+	// TODO - support multiselect tag
+	// ========================================================================
+	public static void list(Long searchTagId) {
+		List<Person> personList = new ArrayList<>();
+
+		if (AppConstants.DEFAULT_SEARCH_TAG_ID.equals(searchTagId)) {
+			// ================================================================
+			// TODO - pagination
+			// ================================================================
+			personList = Person.findAll();
+		} else {
+			personList = Person.findByTagId(searchTagId);
+		}
+
+		renderArgs.put(AppConstants.PARAM_TAG_LIST, Tag.findAll());
+		renderArgs.put(AppConstants.PARAM_PERSON_LIST, personList);
+
+		params.flash();
+		render();
 	}
 
 	private static Long getTagId(String tagName) {
@@ -112,10 +128,7 @@ public class Contact extends Controller {
 
 			tagList = serializer.read(TagListDto.class, tagResponse);
 		} catch (Exception e) {
-			// ===================================================================
-			// TODO - do logging
-			// ===================================================================
-			e.printStackTrace();
+			Logger.error(e, Messages.get(AppConstants.ERROR_MSG_GENERAL));
 		} finally {
 			if (resp != null) {
 				resp.close();
@@ -133,15 +146,4 @@ public class Contact extends Controller {
 
 		return tagId;
 	}
-
-	private static List<Long> getPersonIds(List<PersonDto> personList) {
-		List<Long> personIdList = new ArrayList<>();
-
-		for (PersonDto person : personList) {
-			personIdList.add(person.getId().getValue());
-		}
-
-		return personIdList;
-	}
-	
 }

@@ -1,0 +1,71 @@
+#{extends 'main.html' /}
+#{set title:'Contacts | List' /}
+#{set 'moreScripts'}
+	#{script 'contact.js' /}
+#{/set}
+
+<div class="tag-form list">
+	<div class="inner">
+
+		<a href="@{Contact.retrieve()}" target="_parent">
+			<button class="btn btn-primary btn-sm tag-nav-btn">Contact
+				Retrieval</button>
+		</a>
+
+		<form action="@{Contact.list()}" method="GET" class="form-inline"
+			role="form">
+			<div class="form-group">
+				<select name="searchTagId" class="form-select space-bottom"
+					data-live-search="true">
+					<option value="0" data-content="<span class='select-label label label-primary'>All</span>">All</option>
+					#{list tagList, as : 'tag'}
+						#{if tag.id.toString().equals(flash.searchTagId)}
+							<option selected="selected" value="${tag.id}" data-content="<span class='select-label label label-primary'>${tag.name}</span>">${tag.name}</option>
+						#{/if}
+						#{else}
+							<option value="${tag.id}" data-content="<span class='select-label label label-primary'>${tag.name}</span>">${tag.name}</option>
+						#{/else}
+					#{/list}
+				</select>
+			</div>
+			<button id="getContactBtn" type="submit"
+				class="btn btn-outlined btn-primary">Search</button>
+		</form>
+
+		<div class="person-list-container">
+			<div class="table-responsive space-top">
+				<table class="person-list table table-striped table-hover">
+					<thead>
+						<tr>
+							<th class="avatar-col"></th>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Title</th>
+							<th>Company Name</th>
+						</tr>
+					</thead>
+					<tbody>
+						#{if personList.size() > 0}
+							#{list personList, as : 'person'}
+								<tr>
+									<td class="avatar-col">
+										<img src="${person.avatarUrl}" alt="Image 03" class="img-responsive img-circle">
+									</td>
+									<td>${person.firstName}</td>
+									<td>${person.lastName}</td>
+									<td>${person.title}</td>
+									<td>${person.companyName}</td>
+								</tr>
+							#{/list}
+						#{/if}
+						#{else}
+							<tr>
+								<td class="empty-list-col" colspan="5">No record found</td>
+							</tr>
+						#{/else}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
